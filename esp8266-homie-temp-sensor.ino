@@ -1,6 +1,7 @@
 #define PIN_SIGNAL 15 //pin where locate Signal LED
 #define PIN_OWIRE  13 //pin where locate temperature sensor
 #define PIN_RESET  02 //reset pin
+#define PIN_ADC    A0 //ADC pin
 
 #include <OneWire.h>
 #include <DallasTemperature.h>
@@ -27,7 +28,7 @@ void loopHandler() {
     lastTemperatureSent = millis();
   }
   if (millis() - lastSupplySent >= TEMPERATURE_INTERVAL * 1000UL || lastSupplySent == 0) {
-    float volts = (analogRead(A0)/1023.0)*5; // Volts from ADC
+    float volts = (analogRead(PIN_ADC)/1023.0)*5; // Volts from ADC
     Homie.getLogger() << "Supply voltage: " << volts << " V" << endl;
     supplyNode.setProperty("supply-voltage").send(String(volts));
 
@@ -50,7 +51,8 @@ void setup() {
                                       .setDatatype("float")
                                       .setUnit("ºC");
   
-  pinMode     (A0,         INPUT); // Initialize ADC for voltage measurement
+  pinMode(PIN_ADC, INPUT); // Initialize ADC for voltage measurement
+  
   supplyNode.advertise("supply-voltage").setName("Volts")
                                       .setDatatype("float")
                                       .setUnit("V");
